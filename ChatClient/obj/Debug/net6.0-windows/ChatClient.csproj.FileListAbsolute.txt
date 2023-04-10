@@ -1,0 +1,17 @@
+E:\NetworkChatProject\ChatClient\bin\Debug\net6.0-windows\ChatClient.exe
+E:\NetworkChatProject\ChatClient\bin\Debug\net6.0-windows\ChatClient.deps.json
+E:\NetworkChatProject\ChatClient\bin\Debug\net6.0-windows\ChatClient.runtimeconfig.json
+E:\NetworkChatProject\ChatClient\bin\Debug\net6.0-windows\ChatClient.dll
+E:\NetworkChatProject\ChatClient\bin\Debug\net6.0-windows\ChatClient.pdb
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.csproj.AssemblyReference.cache
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.ClientForm.resources
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.csproj.GenerateResource.cache
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.GeneratedMSBuildEditorConfig.editorconfig
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.AssemblyInfoInputs.cache
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.AssemblyInfo.cs
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.csproj.CoreCompileInputs.cache
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.dll
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\refint\ChatClient.dll
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.pdb
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ChatClient.genruntimeconfig.cache
+E:\NetworkChatProject\ChatClient\obj\Debug\net6.0-windows\ref\ChatClient.dll

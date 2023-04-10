@@ -1,0 +1,15 @@
+E:\NetworkChatProject\ChatServer\bin\Debug\net6.0\ChatServer.exe
+E:\NetworkChatProject\ChatServer\bin\Debug\net6.0\ChatServer.deps.json
+E:\NetworkChatProject\ChatServer\bin\Debug\net6.0\ChatServer.runtimeconfig.json
+E:\NetworkChatProject\ChatServer\bin\Debug\net6.0\ChatServer.dll
+E:\NetworkChatProject\ChatServer\bin\Debug\net6.0\ChatServer.pdb
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.csproj.AssemblyReference.cache
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.GeneratedMSBuildEditorConfig.editorconfig
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.AssemblyInfoInputs.cache
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.AssemblyInfo.cs
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.csproj.CoreCompileInputs.cache
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.dll
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\refint\ChatServer.dll
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.pdb
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ChatServer.genruntimeconfig.cache
+E:\NetworkChatProject\ChatServer\obj\Debug\net6.0\ref\ChatServer.dll
