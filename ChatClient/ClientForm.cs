@@ -30,7 +30,6 @@ namespace ChatClient
             DisplayMessage(message);
 
             sendBox.Clear();
-
             sendBox.Focus();
         }
     }
