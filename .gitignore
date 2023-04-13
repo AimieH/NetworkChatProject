@@ -20,8 +20,6 @@ packages/
 
 # Windows Forms Designer generated code
 Form1.Designer.cs
-*.Designer.cs
-*.resx
 
 # Build and Test results
 [Tt]est[Rr]esult*/
