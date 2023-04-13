@@ -6,7 +6,7 @@ namespace ChatClient;
 
 public class Client
 {
-    private UdpClient client = new();
+    private UdpClient client = new(777);
     private IPEndPoint? targetEndpoint;
 
     private ClientForm form;
