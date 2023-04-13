@@ -10,15 +10,22 @@ var clients = new List<IPEndPoint>();
 
 while (true)
 {
-    var receiveResult = await server.ReceiveAsync();
-    var msgBuffer = receiveResult.Buffer;
-    var sender = receiveResult.RemoteEndPoint;
-    
-    Console.WriteLine($"{Encoding.UTF8.GetString(msgBuffer)}");
-    
-    if (!clients.Contains(sender)) clients.Add(sender);
-    foreach (var client in clients.Where(client => !Equals(client, sender)))
+    try
     {
-        await server.SendAsync(msgBuffer, msgBuffer.Length, client);
+        var receiveResult = await server.ReceiveAsync();
+        var msgBuffer = receiveResult.Buffer;
+        var sender = receiveResult.RemoteEndPoint;
+
+        Console.WriteLine($"{Encoding.UTF8.GetString(msgBuffer)}");
+        
+        if (!clients.Contains(sender)) clients.Add(sender);
+        foreach (var client in clients.Where(client => !Equals(client, sender)))
+        {
+            await server.SendAsync(msgBuffer, msgBuffer.Length, client);
+        }
+    }
+    catch (Exception)
+    {
+        // Ignored
     }
 }
