@@ -44,7 +44,7 @@ public class ClientForm : Form
         chatBox.AppendText(message + Environment.NewLine);
     }
 
-    private void DisplayMessage(string message, string username, Color color)
+    public void DisplayMessage(string message, string username, Color color)
     {
         // Display time
         chatBox.SelectionColor = Color.GhostWhite;
@@ -64,11 +64,11 @@ public class ClientForm : Form
 
     private void SendMessage()
     {
+        string message = sendBox.Text;
+
         if (sendBox.Text == string.Empty) return;
 
-        var message = $"{myUsername} : {sendBox.Text}";
-
-        client.SendToServer(message);
+        client.SendToServer(message, myUsername, myColor);
 
         DisplayMessage(sendBox.Text, myUsername, myColor);
 

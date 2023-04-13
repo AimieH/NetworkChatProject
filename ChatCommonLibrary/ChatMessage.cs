@@ -17,5 +17,13 @@ namespace ChatCommonLibrary
         public string username;
         public string color;
         public MessageType type;
+
+        public ChatMessage(string message, string username, string color, MessageType type)
+        {
+            this.message = message;
+            this.username = username;
+            this.color = color;
+            this.type = type;
+        }
     }
 }
