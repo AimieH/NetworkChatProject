@@ -231,7 +231,7 @@ public class ClientForm : Form
         // sendButton
         // 
         sendButton.BackColor = Color.Transparent;
-        sendButton.BackgroundImage = ;
+        sendButton.BackgroundImage = Properties.Resources.sendIcon;
         sendButton.BackgroundImageLayout = ImageLayout.Stretch;
         sendButton.FlatAppearance.BorderSize = 0;
         sendButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
