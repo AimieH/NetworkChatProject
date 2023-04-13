@@ -6,34 +6,44 @@ namespace ChatClient;
 
 public class Client
 {
-    public class Client
+    private UdpClient client = new();
+    private IPEndPoint? targetEndpoint;
+
+    private ClientForm form;
+    private bool receiving = true;
+
+    public Client(ClientForm form)
     {
-        private UdpClient client = new();
-        private IPEndPoint? targetEndpoint = null;
-
-        private ClientForm form;
-
-        public void SetForm(ClientForm _form)
+        this.form = form;
+    }
+    
+    public void ConnectToServer(string ipString)
+    {
+        if (IPAddress.TryParse(ipString, out var ipAddress))
         {
-            form = _form;
+            targetEndpoint = new IPEndPoint(ipAddress, 666);
+            form.DisplayNotification("Connected to server :)))", NotificationType.Success);
+            StartReceiving();
         }
+        else
+        {
+            form.DisplayNotification("Failed to connect to server :( - 404 :(", NotificationType.Error);
+        }
+    }
+
+    public void SendToServer(string message)
+    {
+        client.SendAsync(Encoding.UTF8.GetBytes(message), targetEndpoint);
+    }
+
+    private async void StartReceiving()
+    {
+        form.DisplayNotification("Receiving started...", NotificationType.Hint);
         
-        public void ConnectToServer(string ipString)
+        while (receiving)
         {
-            if (IPAddress.TryParse(ipString, out var ipAddress))
-            {
-                targetEndpoint = new(ipAddress, 666);
-                form.DisplayError("Connected to server :)))");
-            }
-            else
-            {
-                form.DisplayError("Failed to connect to server :( - 404 :(");
-            }
-        }
-
-        public void SendToServer(string message)
-        {
-            client.SendAsync(Encoding.UTF8.GetBytes(message), targetEndpoint);
+            var receiveResult = await client.ReceiveAsync();
+            form.DisplayNotification(Encoding.UTF8.GetString(receiveResult.Buffer), NotificationType.Hint);
         }
     }
 }
