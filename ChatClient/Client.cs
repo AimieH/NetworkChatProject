@@ -1,6 +1,9 @@
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using ChatCommonLibrary;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace ChatClient;
 
@@ -31,9 +34,13 @@ public class Client
         }
     }
 
-    public void SendToServer(string message)
+    public void SendToServer(string message, string username, Color color)
     {
-        client.SendAsync(Encoding.UTF8.GetBytes(message), targetEndpoint);
+        ChatMessage chatMessage = new ChatMessage(message, username, ColorTranslator.ToHtml(color), MessageType.Message);
+
+        string json = JsonSerializer.Serialize(chatMessage);
+
+        client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
     }
 
     private async void StartReceiving()
@@ -43,7 +50,26 @@ public class Client
         while (receiving)
         {
             var receiveResult = await client.ReceiveAsync();
-            form.DisplayNotification(Encoding.UTF8.GetString(receiveResult.Buffer), NotificationType.Hint);
+
+            string receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
+
+            ChatMessage? receivedMessage = null;
+
+            try
+            {
+                receivedMessage = JsonSerializer.Deserialize<ChatMessage>(receivedJson);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            
+            if (receivedMessage != null)
+            {
+                // Display received message
+                Color color = ColorTranslator.FromHtml(receivedMessage.color);
+                form.DisplayMessage(receivedMessage.message, receivedMessage.username, color);
+            }
         }
     }
 }
