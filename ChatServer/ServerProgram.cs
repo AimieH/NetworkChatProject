@@ -5,7 +5,7 @@ Console.WriteLine("Starting server");
 
 using var server = new UdpClient(666);
 
-for (var i = 0; true; i++)
+for (var i = 0;; i++)
 {
     var receiveResult = await server.ReceiveAsync();
 
