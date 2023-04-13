@@ -109,7 +109,6 @@ namespace ChatClient
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientForm));
             sendBox = new TextBox();
             chatBox = new RichTextBox();
             colorDialog = new ColorDialog();
@@ -229,7 +228,7 @@ namespace ChatClient
             // sendButton
             // 
             sendButton.BackColor = Color.Transparent;
-            sendButton.BackgroundImage = (Image)resources.GetObject("sendButton.BackgroundImage");
+            sendButton.BackgroundImage = Properties.Resources.sendIcon;
             sendButton.BackgroundImageLayout = ImageLayout.Stretch;
             sendButton.FlatAppearance.BorderSize = 0;
             sendButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
