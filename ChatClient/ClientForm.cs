@@ -56,7 +56,6 @@ namespace ChatClient
 
             client.SendToServer(message);
 
-            //DisplayMessage(message);
             DisplayMessage(sendBox.Text, myUsername, myColor);
 
             sendBox.Clear();
