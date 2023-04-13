@@ -38,7 +38,9 @@ public class Client
     {
         ChatMessage chatMessage = new ChatMessage(message, username, ColorTranslator.ToHtml(color), MessageType.Message);
 
+        form.DisplayNotification(chatMessage.Message, NotificationType.Hint);
         string json = JsonSerializer.Serialize(chatMessage);
+        form.DisplayNotification(json, NotificationType.Hint);
 
         client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
     }
@@ -67,8 +69,8 @@ public class Client
             if (receivedMessage != null)
             {
                 // Display received message
-                Color color = ColorTranslator.FromHtml(receivedMessage.color);
-                form.DisplayMessage(receivedMessage.message, receivedMessage.username, color);
+                Color color = ColorTranslator.FromHtml(receivedMessage.Color);
+                form.DisplayMessage(receivedMessage.Message, receivedMessage.Username, color);
             }
         }
     }
