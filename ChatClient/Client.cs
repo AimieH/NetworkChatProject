@@ -36,11 +36,9 @@ public class Client
 
     public async void SendToServer(string message, string username, Color color)
     {
-        var chatMessage = new Message(MessageType.ChatMessage, username, ColorTranslator.ToHtml(color), message);
+        var chatMessage = new Message(MessageType.ChatMessage, message, username, ColorTranslator.ToHtml(color));
 
-        form.DisplayNotification(chatMessage.Text, NotificationType.Hint);
         var json = JsonSerializer.Serialize(chatMessage);
-        form.DisplayNotification(json, NotificationType.Hint);
 
         await client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
     }
@@ -57,15 +55,17 @@ public class Client
 
             try
             {
+                form.DisplayNotification(receivedJson, NotificationType.Hint);
                 var receivedMessage = JsonSerializer.Deserialize<Message>(receivedJson);
-                
+                form.DisplayNotification(receivedMessage.Text, NotificationType.Hint);
+
                 // Display received message
                 var color = ColorTranslator.FromHtml(receivedMessage?.Color ?? string.Empty);
                 form.DisplayMessage(receivedMessage?.Text ?? string.Empty, receivedMessage?.Username ?? string.Empty, color);
             }
-            catch (Exception)
+            catch (JsonException ex)
             {
-                // ignored
+                form.DisplayNotification(ex.ToString(), NotificationType.Hint);
             }
         }
     }
