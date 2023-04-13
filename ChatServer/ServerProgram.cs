@@ -19,6 +19,13 @@ while (true)
     if (!clients.Contains(sender)) clients.Add(sender);
     foreach (var client in clients.Where(client => !Equals(client, sender)))
     {
-        await server.SendAsync(msgBuffer, msgBuffer.Length, client);
+        try
+        {
+            await server.SendAsync(msgBuffer, msgBuffer.Length, client);
+        }
+        catch (Exception)
+        {
+            clients.Remove(client);
+        }
     }
 }
