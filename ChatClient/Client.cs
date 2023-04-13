@@ -2,8 +2,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using ChatCommonLibrary;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using Message = ChatCommonLibrary.Message;
 
 namespace ChatClient;
 
@@ -34,15 +34,15 @@ public class Client
         }
     }
 
-    public void SendToServer(string message, string username, Color color)
+    public async void SendToServer(string message, string username, Color color)
     {
-        ChatMessage chatMessage = new ChatMessage(message, username, ColorTranslator.ToHtml(color), MessageType.Message);
+        var chatMessage = new Message(MessageType.ChatMessage, username, ColorTranslator.ToHtml(color), message);
 
-        form.DisplayNotification(chatMessage.Message, NotificationType.Hint);
-        string json = JsonSerializer.Serialize(chatMessage);
+        form.DisplayNotification(chatMessage.Text, NotificationType.Hint);
+        var json = JsonSerializer.Serialize(chatMessage);
         form.DisplayNotification(json, NotificationType.Hint);
 
-        client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
+        await client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
     }
 
     private async void StartReceiving()
@@ -53,24 +53,19 @@ public class Client
         {
             var receiveResult = await client.ReceiveAsync();
 
-            string receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
-
-            ChatMessage? receivedMessage = null;
+            var receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
 
             try
             {
-                receivedMessage = JsonSerializer.Deserialize<ChatMessage>(receivedJson);
+                var receivedMessage = JsonSerializer.Deserialize<Message>(receivedJson);
+                
+                // Display received message
+                var color = ColorTranslator.FromHtml(receivedMessage?.Color ?? string.Empty);
+                form.DisplayMessage(receivedMessage?.Text ?? string.Empty, receivedMessage?.Username ?? string.Empty, color);
             }
             catch (Exception)
             {
                 // ignored
-            }
-            
-            if (receivedMessage != null)
-            {
-                // Display received message
-                Color color = ColorTranslator.FromHtml(receivedMessage.Color);
-                form.DisplayMessage(receivedMessage.Message, receivedMessage.Username, color);
             }
         }
     }
