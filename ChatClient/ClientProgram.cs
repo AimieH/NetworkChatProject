@@ -1,12 +1,11 @@
-namespace ChatClient
+namespace ChatClient;
+
+internal static class ClientProgram
 {
-    internal static class ClientProgram
+    [STAThread]
+    static void Main()
     {
-        [STAThread]
-        static void Main()
-        {
-            ApplicationConfiguration.Initialize();
-            Application.Run(new ClientForm());
-        }
+        ApplicationConfiguration.Initialize();
+        Application.Run(new ClientForm());
     }
 }
