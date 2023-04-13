@@ -17,7 +17,7 @@ namespace ChatClient
 
         private string myUsername = "username";
         private TextBox usernameBox;
-        private Label label1;
+        private Label usernameLabel;
         private Color myColor = Color.Black;
 
         public ClientForm()
@@ -51,7 +51,7 @@ namespace ChatClient
 
         private void SendButton_Click(object sender, EventArgs e)
         {
-            string message = $"{"username"} : {sendBox.Text}";
+            string message = $"{myUsername} : {sendBox.Text}";
 
             client.SendAsync(Encoding.UTF8.GetBytes(message), targetEndpoint);
 
@@ -82,7 +82,7 @@ namespace ChatClient
             colorDialog = new ColorDialog();
             colorButton = new Button();
             usernameBox = new TextBox();
-            label1 = new Label();
+            usernameLabel = new Label();
             SuspendLayout();
             // 
             // sendButton
@@ -138,21 +138,21 @@ namespace ChatClient
             usernameBox.TabIndex = 5;
             usernameBox.TextChanged += UsernameBox_TextChanged;
             // 
-            // label1
+            // usernameLabel
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(57, 15);
-            label1.Name = "label1";
-            label1.Size = new Size(168, 18);
-            label1.TabIndex = 6;
-            label1.Text = "Choose your username :";
+            usernameLabel.AutoSize = true;
+            usernameLabel.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
+            usernameLabel.Location = new Point(57, 15);
+            usernameLabel.Name = "usernameLabel";
+            usernameLabel.Size = new Size(168, 18);
+            usernameLabel.TabIndex = 6;
+            usernameLabel.Text = "Choose your username :";
             // 
             // ClientForm
             // 
             BackColor = Color.Azure;
             ClientSize = new Size(771, 502);
-            Controls.Add(label1);
+            Controls.Add(usernameLabel);
             Controls.Add(usernameBox);
             Controls.Add(colorButton);
             Controls.Add(chatBox);
