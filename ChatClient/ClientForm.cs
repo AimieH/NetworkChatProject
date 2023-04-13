@@ -6,8 +6,7 @@ namespace ChatClient
 {
     public class ClientForm : Form
     {
-        private UdpClient client = new ();
-        private IPEndPoint targetEndpoint = new (IPAddress.Parse("10.51.2.72"), 666);
+        private Client client = new ();
 
         private Button sendButton;
         private RichTextBox chatBox;
@@ -18,20 +17,13 @@ namespace ChatClient
         private string myUsername = "username";
         private TextBox usernameBox;
         private Label usernameLabel;
+        private Label label1;
         private Color myColor = Color.Black;
 
         public ClientForm()
         {
-            sendButton = new Button();
-            sendBox = new TextBox();
-            chatBox = new RichTextBox();
-            colorDialog = new ColorDialog();
-            colorButton = new Button();
-            usernameBox = new TextBox();
-            usernameLabel = new Label();
-            
             InitializeComponent();
-            
+
             sendBox.Focus();
         }
 
@@ -62,7 +54,7 @@ namespace ChatClient
         {
             var message = $"{myUsername} : {sendBox.Text}";
 
-            client.SendAsync(Encoding.UTF8.GetBytes(message), targetEndpoint);
+            client.SendToServer(message);
 
             //DisplayMessage(message);
             DisplayMessage(sendBox.Text, myUsername, myColor);
@@ -85,9 +77,17 @@ namespace ChatClient
 
         private void InitializeComponent()
         {
+            sendButton = new Button();
+            sendBox = new TextBox();
+            chatBox = new RichTextBox();
+            colorDialog = new ColorDialog();
+            colorButton = new Button();
+            usernameBox = new TextBox();
+            usernameLabel = new Label();
             SuspendLayout();
-            
+            //
             // sendButton
+            //
             sendButton.Location = new Point(705, 467);
             sendButton.Name = "sendButton";
             sendButton.Size = new Size(54, 27);
@@ -95,16 +95,18 @@ namespace ChatClient
             sendButton.Text = "Send";
             sendButton.UseVisualStyleBackColor = true;
             sendButton.Click += SendButton_Click;
-            
+            //
             // sendBox
+            //
             sendBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             sendBox.Location = new Point(12, 468);
             sendBox.Name = "sendBox";
             sendBox.PlaceholderText = "Type your message";
             sendBox.Size = new Size(687, 26);
             sendBox.TabIndex = 2;
-            
+            //
             // chatBox
+            //
             chatBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             chatBox.Location = new Point(12, 44);
             chatBox.Name = "chatBox";
@@ -112,11 +114,13 @@ namespace ChatClient
             chatBox.Size = new Size(747, 417);
             chatBox.TabIndex = 3;
             chatBox.Text = "";
-            
+            //
             // colorDialog
+            //
             colorDialog.AnyColor = true;
-            
+            //
             // colorButton
+            //
             colorButton.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             colorButton.Location = new Point(478, 12);
             colorButton.Name = "colorButton";
@@ -125,16 +129,18 @@ namespace ChatClient
             colorButton.Text = "Choose your  color";
             colorButton.UseVisualStyleBackColor = true;
             colorButton.Click += ColorButton_Click;
-            
+            //
             // usernameBox
+            //
             usernameBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             usernameBox.Location = new Point(231, 12);
             usernameBox.Name = "usernameBox";
             usernameBox.Size = new Size(241, 26);
             usernameBox.TabIndex = 5;
             usernameBox.TextChanged += UsernameBox_TextChanged;
-            
+            //
             // usernameLabel
+            //
             usernameLabel.AutoSize = true;
             usernameLabel.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             usernameLabel.Location = new Point(57, 15);
@@ -142,8 +148,9 @@ namespace ChatClient
             usernameLabel.Size = new Size(168, 18);
             usernameLabel.TabIndex = 6;
             usernameLabel.Text = "Choose your username :";
-            
+            //
             // ClientForm
+            //
             BackColor = Color.Azure;
             ClientSize = new Size(771, 502);
             Controls.Add(usernameLabel);
