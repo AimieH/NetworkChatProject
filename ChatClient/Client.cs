@@ -27,10 +27,12 @@ public class Client
             targetEndpoint = new IPEndPoint(ipAddress, 666);
             form.DisplayNotification("Connected to server :)))", NotificationType.Success);
             StartReceiving();
+            form.Connect(true);
         }
         else
         {
             form.DisplayNotification("Failed to connect to server :( - 404 :(", NotificationType.Error);
+            form.Connect(false);
         }
     }
 

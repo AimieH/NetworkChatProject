@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using System.Windows.Forms;
 using System.Windows.Forms.PropertyGridInternal;
 
 namespace ChatClient;
@@ -24,11 +25,17 @@ public class ClientForm : Form
     {
         client = new Client(this);
         InitializeComponent();
+        SetRandomColor();
+        sendBox.Enabled = false;
     }
 
-    private void DisplayMessage(string message)
+    private void SetRandomColor()
     {
-        chatBox.AppendText(message + Environment.NewLine);
+        int r = Random.Shared.Next(200) + 55;
+        int g = Random.Shared.Next(200) + 55;
+        int b = Random.Shared.Next(200) + 55;
+        myColor = Color.FromArgb(255, r, g, b);
+        colorButton.BackColor = myColor;
     }
 
     public void DisplayNotification(string message, NotificationType type)
@@ -42,6 +49,8 @@ public class ClientForm : Form
         };
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
         chatBox.AppendText(message + Environment.NewLine);
+
+        chatBox.ScrollToCaret();
     }
 
     public void DisplayMessage(string message, string username, Color color)
@@ -60,6 +69,8 @@ public class ClientForm : Form
         chatBox.SelectionColor = chatBox.ForeColor;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Regular);
         chatBox.AppendText(message + Environment.NewLine);
+
+        chatBox.ScrollToCaret();
     }
 
     private void SendMessage()
@@ -108,6 +119,15 @@ public class ClientForm : Form
         client.ConnectToServer(ipTextBox.Text);
     }
 
+    public void Connect(bool success)
+    {
+        sendBox.Enabled = success;
+        if (success)
+        {
+            sendBox.Focus();
+        }
+    }
+
     private void InitializeComponent()
     {
         sendBox = new TextBox();
@@ -124,19 +144,21 @@ public class ClientForm : Form
         // 
         // sendBox
         // 
+        sendBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         sendBox.BackColor = Color.FromArgb(75, 75, 75);
         sendBox.BorderStyle = BorderStyle.FixedSingle;
         sendBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
         sendBox.ForeColor = SystemColors.Control;
-        sendBox.Location = new Point(12, 534);
+        sendBox.Location = new Point(12, 666);
         sendBox.Name = "sendBox";
         sendBox.PlaceholderText = "Type your message";
-        sendBox.Size = new Size(838, 26);
+        sendBox.Size = new Size(762, 26);
         sendBox.TabIndex = 2;
         sendBox.KeyDown += SendBox_KeyDown;
         // 
         // chatBox
         // 
+        chatBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         chatBox.BackColor = Color.FromArgb(44, 44, 44);
         chatBox.BorderStyle = BorderStyle.None;
         chatBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
@@ -144,7 +166,8 @@ public class ClientForm : Form
         chatBox.Location = new Point(12, 77);
         chatBox.Name = "chatBox";
         chatBox.ReadOnly = true;
-        chatBox.Size = new Size(874, 450);
+        chatBox.ScrollBars = RichTextBoxScrollBars.Vertical;
+        chatBox.Size = new Size(798, 582);
         chatBox.TabIndex = 3;
         chatBox.Text = "";
         // 
@@ -228,6 +251,7 @@ public class ClientForm : Form
         // 
         // sendButton
         // 
+        sendButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
         sendButton.BackColor = Color.Transparent;
         sendButton.BackgroundImage = Properties.Resources.sendIcon;
         sendButton.BackgroundImageLayout = ImageLayout.Stretch;
@@ -236,7 +260,7 @@ public class ClientForm : Form
         sendButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
         sendButton.FlatStyle = FlatStyle.Flat;
         sendButton.ForeColor = Color.Transparent;
-        sendButton.Location = new Point(856, 534);
+        sendButton.Location = new Point(780, 666);
         sendButton.Name = "sendButton";
         sendButton.Size = new Size(30, 26);
         sendButton.TabIndex = 10;
@@ -246,7 +270,7 @@ public class ClientForm : Form
         // ClientForm
         // 
         BackColor = Color.FromArgb(61, 61, 61);
-        ClientSize = new Size(898, 571);
+        ClientSize = new Size(822, 703);
         Controls.Add(sendButton);
         Controls.Add(connectButton);
         Controls.Add(ipLabel);
@@ -256,6 +280,7 @@ public class ClientForm : Form
         Controls.Add(colorButton);
         Controls.Add(chatBox);
         Controls.Add(sendBox);
+        MinimumSize = new Size(622, 306);
         Name = "ClientForm";
         ResumeLayout(false);
         PerformLayout();
