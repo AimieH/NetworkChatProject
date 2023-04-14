@@ -9,10 +9,10 @@ namespace ChatClient;
 
 public class Client
 {
-    private UdpClient client = new(777);
+    private readonly UdpClient client = new(777);
     private IPEndPoint? targetEndpoint;
 
-    private ClientForm form;
+    private readonly ClientForm form;
     private bool receiving = true;
 
     public Client(ClientForm form)
@@ -52,23 +52,23 @@ public class Client
         while (receiving)
         {
             var receiveResult = await client.ReceiveAsync();
-
             var receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
-
+            
+            Message? receivedMessage = null;
             try
             {
-                form.DisplayNotification(receivedJson, NotificationType.Hint);
-                var receivedMessage = JsonSerializer.Deserialize<Message>(receivedJson);
-                form.DisplayNotification(receivedMessage.Text, NotificationType.Hint);
-
-                // Display received message
-                var color = ColorTranslator.FromHtml(receivedMessage?.Color ?? string.Empty);
-                form.DisplayMessage(receivedMessage?.Text ?? string.Empty, receivedMessage?.Username ?? string.Empty, color);
+                receivedMessage = JsonSerializer.Deserialize<Message>(receivedJson);
             }
             catch (JsonException ex)
             {
                 form.DisplayNotification(ex.ToString(), NotificationType.Hint);
             }
+
+            if (receivedMessage is null) return;
+            var color = ColorTranslator.FromHtml(receivedMessage.Color);
+
+            // Display received message
+            form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color);
         }
     }
 }

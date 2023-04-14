@@ -19,6 +19,11 @@ namespace ChatCommonLibrary
         public string Username { get; set; }
         public string Color { get; set; }
 
+        public Message()
+        {
+            // Required for deserialization
+        }
+        
         public Message(MessageType type, string message, string username, string color)
         {
             Type = type;
