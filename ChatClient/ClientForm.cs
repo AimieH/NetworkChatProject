@@ -4,20 +4,21 @@ namespace ChatClient;
 
 public class ClientForm : Form
 {
-    private static readonly string[] usernames = {"ChatonFéroce", "ChoupiPanda", "RatonLaveur", "TitiGivré", "BouleDePoule", "TigrouFou", "LapinDentelle", "KoalaFunky", "RenardAstucieux", "LoupBlagueur", "ZèbreFarceur", "GirafeTordue", "ChimpanzéCinglé", "HippopotameHilarant", "ÉcureuilÉtourdi", "PhoqueFoufou", "GrenouilleGivrée", "AlligatorAmusant", "OursRieur", "PingouinPince-Sans-Rire", "CrocodileComique", "PerroquetPlaisantin", "SingeSarcastique", "LamaLunatique", "VacheVentriloque", "ÉléphantEsprit", "LoutreLoufoque", "MarmotteMarrante", "HérissonHilarant", "CastorCocasse", "NarvalNarcissique", "OrnithorynqueOriental", "RhinocérosRieur", "SaumonSarcastique", "AigleAmusé", "BaleineBlagueuse", "CanardClownesque", "DindonDramatique", "EscargotÉtonné", "FourmiFarfelue", "GirouetteGrotesque", "HéronHilarant", "IbisIrrévérencieux", "JaguarJovial", "KangourouKamikaze", "LézardLoufoque", "MéduseMarrante", "NandouNarquois", "OrqueObservateur"};
+    private static readonly string[] usernames = { "ChatonFéroce", "ChoupiPanda", "RatonLaveur", "TitiGivré", "BouleDePoule", "TigrouFou", "LapinDentelle", "KoalaFunky", "RenardAstucieux", "LoupBlagueur", "ZèbreFarceur", "GirafeTordue", "ChimpanzéCinglé", "HippopotameHilarant", "ÉcureuilÉtourdi", "PhoqueFoufou", "GrenouilleGivrée", "AlligatorAmusant", "OursRieur", "PingouinPince-Sans-Rire", "CrocodileComique", "PerroquetPlaisantin", "SingeSarcastique", "LamaLunatique", "VacheVentriloque", "ÉléphantEsprit", "LoutreLoufoque", "MarmotteMarrante", "HérissonHilarant", "CastorCocasse", "NarvalNarcissique", "OrnithorynqueOriental", "RhinocérosRieur", "SaumonSarcastique", "AigleAmusé", "BaleineBlagueuse", "CanardClownesque", "DindonDramatique", "EscargotÉtonné", "FourmiFarfelue", "GirouetteGrotesque", "HéronHilarant", "IbisIrrévérencieux", "JaguarJovial", "KangourouKamikaze", "LézardLoufoque", "MéduseMarrante", "NandouNarquois", "OrqueObservateur" };
     private Client client;
     private RichTextBox chatBox;
     private ColorDialog colorDialog;
     private Button colorButton;
     private TextBox sendBox;
 
-    private string myUsername;
     private TextBox usernameBox;
     private Label usernameLabel;
     private Label ipLabel;
     private TextBox ipTextBox;
     private Button connectButton;
     private Button sendButton;
+
+    private string myUsername;
     private Color myColor = Color.Black;
 
     public ClientForm()
@@ -37,10 +38,10 @@ public class ClientForm : Form
         myColor = Color.FromArgb(255, r, g, b);
         colorButton.BackColor = myColor;
     }
-    
+
     private void SetRandomUsername()
     {
-        myUsername = usernames[Random.Shared.Next(usernames.Length)-1];
+        myUsername = usernames[Random.Shared.Next(usernames.Length) - 1];
         usernameBox.Text = myUsername;
     }
 
@@ -65,17 +66,17 @@ public class ClientForm : Form
         chatBox.SelectionColor = color;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
         chatBox.AppendText($"{username} ");
-        
+
         // Display time
         chatBox.SelectionColor = Color.GhostWhite;
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
         chatBox.AppendText(DateTime.Now.ToString("HH:mm tt" + Environment.NewLine));
-        
+
         // Display message
         chatBox.SelectionColor = chatBox.ForeColor;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Regular);
         chatBox.AppendText(message + Environment.NewLine);
-        
+
         // Display separation
         chatBox.SelectionColor = chatBox.ForeColor;
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
@@ -105,8 +106,13 @@ public class ClientForm : Form
 
     private void SendBox_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Enter)
+        if (e.KeyCode == Keys.Enter && e.Modifiers.HasFlag(Keys.Shift))
         {
+            // New line
+        }
+        else if (e.KeyCode == Keys.Enter)
+        {
+            // Send
             SendMessage();
             e.Handled = true;
             e.SuppressKeyPress = true;
@@ -161,9 +167,10 @@ public class ClientForm : Form
         sendBox.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
         sendBox.ForeColor = SystemColors.Control;
         sendBox.Location = new Point(12, 666);
+        sendBox.Multiline = true;
         sendBox.Name = "sendBox";
         sendBox.PlaceholderText = Resources.type_message;
-        sendBox.Size = new Size(762, 26);
+        sendBox.Size = new Size(762, 23);
         sendBox.TabIndex = 2;
         sendBox.KeyDown += SendBox_KeyDown;
         // 
@@ -221,7 +228,7 @@ public class ClientForm : Form
         usernameLabel.Name = "usernameLabel";
         usernameLabel.Size = new Size(168, 18);
         usernameLabel.TabIndex = 6;
-        usernameLabel.Text = Resources.choose_username;
+        usernameLabel.Text = "Choose your username :";
         // 
         // ipLabel
         // 
@@ -232,7 +239,7 @@ public class ClientForm : Form
         ipLabel.Name = "ipLabel";
         ipLabel.Size = new Size(77, 18);
         ipLabel.TabIndex = 8;
-        ipLabel.Text = Resources.server_ip;
+        ipLabel.Text = "Server IP :";
         // 
         // ipTextBox
         // 
