@@ -1,18 +1,17 @@
-using System.Runtime.Versioning;
-using System.Windows.Forms;
-using System.Windows.Forms.PropertyGridInternal;
+using ChatClient.Properties;
 
 namespace ChatClient;
 
 public class ClientForm : Form
 {
+    private static readonly string[] usernames = {"ChatonFéroce", "ChoupiPanda", "RatonLaveur", "TitiGivré", "BouleDePoule", "TigrouFou", "LapinDentelle", "KoalaFunky", "RenardAstucieux", "LoupBlagueur", "ZèbreFarceur", "GirafeTordue", "ChimpanzéCinglé", "HippopotameHilarant", "ÉcureuilÉtourdi", "PhoqueFoufou", "GrenouilleGivrée", "AlligatorAmusant", "OursRieur", "PingouinPince-Sans-Rire", "CrocodileComique", "PerroquetPlaisantin", "SingeSarcastique", "LamaLunatique", "VacheVentriloque", "ÉléphantEsprit", "LoutreLoufoque", "MarmotteMarrante", "HérissonHilarant", "CastorCocasse", "NarvalNarcissique", "OrnithorynqueOriental", "RhinocérosRieur", "SaumonSarcastique", "AigleAmusé", "BaleineBlagueuse", "CanardClownesque", "DindonDramatique", "EscargotÉtonné", "FourmiFarfelue", "GirouetteGrotesque", "HéronHilarant", "IbisIrrévérencieux", "JaguarJovial", "KangourouKamikaze", "LézardLoufoque", "MéduseMarrante", "NandouNarquois", "OrqueObservateur"};
     private Client client;
     private RichTextBox chatBox;
     private ColorDialog colorDialog;
     private Button colorButton;
     private TextBox sendBox;
 
-    private string myUsername = "username";
+    private string myUsername;
     private TextBox usernameBox;
     private Label usernameLabel;
     private Label ipLabel;
@@ -26,6 +25,7 @@ public class ClientForm : Form
         client = new Client(this);
         InitializeComponent();
         SetRandomColor();
+        SetRandomUsername();
         sendBox.Enabled = false;
     }
 
@@ -36,6 +36,12 @@ public class ClientForm : Form
         int b = Random.Shared.Next(200) + 55;
         myColor = Color.FromArgb(255, r, g, b);
         colorButton.BackColor = myColor;
+    }
+    
+    private void SetRandomUsername()
+    {
+        myUsername = usernames[Random.Shared.Next(usernames.Length)-1];
+        usernameBox.Text = myUsername;
     }
 
     public void DisplayNotification(string message, NotificationType type)
@@ -55,20 +61,25 @@ public class ClientForm : Form
 
     public void DisplayMessage(string message, string username, Color color)
     {
-        // Display time
-        chatBox.SelectionColor = Color.GhostWhite;
-        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
-        chatBox.AppendText(DateTime.Now.ToString("  " + "HH:mm tt"));
-
         // Display username
         chatBox.SelectionColor = color;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
-        chatBox.AppendText($"  {username} : ");
-
+        chatBox.AppendText($"{username} ");
+        
+        // Display time
+        chatBox.SelectionColor = Color.GhostWhite;
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
+        chatBox.AppendText(DateTime.Now.ToString("HH:mm tt" + Environment.NewLine));
+        
         // Display message
         chatBox.SelectionColor = chatBox.ForeColor;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Regular);
         chatBox.AppendText(message + Environment.NewLine);
+        
+        // Display separation
+        chatBox.SelectionColor = chatBox.ForeColor;
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
+        chatBox.AppendText(Environment.NewLine);
 
         chatBox.ScrollToCaret();
     }
@@ -151,7 +162,7 @@ public class ClientForm : Form
         sendBox.ForeColor = SystemColors.Control;
         sendBox.Location = new Point(12, 666);
         sendBox.Name = "sendBox";
-        sendBox.PlaceholderText = "Type your message";
+        sendBox.PlaceholderText = Resources.type_message;
         sendBox.Size = new Size(762, 26);
         sendBox.TabIndex = 2;
         sendBox.KeyDown += SendBox_KeyDown;
@@ -185,7 +196,7 @@ public class ClientForm : Form
         colorButton.Name = "colorButton";
         colorButton.Size = new Size(158, 26);
         colorButton.TabIndex = 4;
-        colorButton.Text = "Choose your  color";
+        colorButton.Text = Resources.choose_color;
         colorButton.UseVisualStyleBackColor = false;
         colorButton.Click += ColorButton_Click;
         // 
@@ -210,7 +221,7 @@ public class ClientForm : Form
         usernameLabel.Name = "usernameLabel";
         usernameLabel.Size = new Size(168, 18);
         usernameLabel.TabIndex = 6;
-        usernameLabel.Text = "Choose your username :";
+        usernameLabel.Text = Resources.choose_username;
         // 
         // ipLabel
         // 
@@ -221,7 +232,7 @@ public class ClientForm : Form
         ipLabel.Name = "ipLabel";
         ipLabel.Size = new Size(77, 18);
         ipLabel.TabIndex = 8;
-        ipLabel.Text = "Server IP :";
+        ipLabel.Text = Resources.server_ip;
         // 
         // ipTextBox
         // 
@@ -245,7 +256,7 @@ public class ClientForm : Form
         connectButton.Name = "connectButton";
         connectButton.Size = new Size(158, 26);
         connectButton.TabIndex = 9;
-        connectButton.Text = "Connect";
+        connectButton.Text = Resources.connect;
         connectButton.UseVisualStyleBackColor = false;
         connectButton.Click += ConnectButton_Click;
         // 
@@ -253,7 +264,7 @@ public class ClientForm : Form
         // 
         sendButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
         sendButton.BackColor = Color.Transparent;
-        sendButton.BackgroundImage = Properties.Resources.sendIcon;
+        sendButton.BackgroundImage = Resources.sendIcon;
         sendButton.BackgroundImageLayout = ImageLayout.Stretch;
         sendButton.FlatAppearance.BorderSize = 0;
         sendButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
