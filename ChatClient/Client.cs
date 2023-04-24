@@ -25,20 +25,20 @@ public class Client
         if (IPAddress.TryParse(ipString, out var ipAddress))
         {
             targetEndpoint = new IPEndPoint(ipAddress, 666);
-            form.DisplayNotification("Connected to server :)))", NotificationType.Success);
+            form.DisplayNotification("Checking given server...", NotificationType.Hint);
             StartReceiving();
-            form.Connect(true);
+            SendToServer(MessageType.Connect);
         }
         else
         {
-            form.DisplayNotification("Failed to connect to server :( - 404 :(", NotificationType.Error);
+            form.DisplayNotification("Given server ip is not an available one :(", NotificationType.Error);
             form.Connect(false);
         }
     }
 
-    public async void SendToServer(string message, string username, Color color)
+    public async void SendToServer(MessageType type, string message = "", string username = "", Color color = new())
     {
-        var chatMessage = new Message(MessageType.ChatMessage, message, username, ColorTranslator.ToHtml(color));
+        var chatMessage = new Message(type, message, username, ColorTranslator.ToHtml(color));
 
         var json = JsonSerializer.Serialize(chatMessage);
 
@@ -65,10 +65,28 @@ public class Client
             }
 
             if (receivedMessage is null) return;
-            var color = ColorTranslator.FromHtml(receivedMessage.Color);
 
-            // Display received message
-            form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color);
+            switch (receivedMessage.Type)
+            {
+                case MessageType.ChatMessage:
+                    // Display received message
+                    var color = ColorTranslator.FromHtml(receivedMessage.Color);
+                    form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color);
+                    break;
+                case MessageType.Connect:
+                    form.DisplayNotification("Connected to server :)", NotificationType.Success);
+                    form.Connect(true);
+                    break;
+                case MessageType.Disconnect:
+                    form.DisplayNotification("Server disconnected :(", NotificationType.Error);
+                    form.Connect(false);
+                    break;
+                case MessageType.Heartbeat:
+                    break;
+                default:
+                    form.DisplayNotification("Message type not handled :(", NotificationType.Error);
+                    break;
+            }
         }
     }
 }

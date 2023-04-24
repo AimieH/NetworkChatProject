@@ -1,4 +1,5 @@
 using ChatClient.Properties;
+using ChatCommonLibrary;
 
 namespace ChatClient;
 
@@ -62,6 +63,11 @@ public class ClientForm : Form
 
     public void DisplayMessage(string message, string username, Color color)
     {
+        // Display separation
+        chatBox.SelectionColor = chatBox.ForeColor;
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
+        chatBox.AppendText(Environment.NewLine);
+        
         // Display username
         chatBox.SelectionColor = color;
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
@@ -77,11 +83,6 @@ public class ClientForm : Form
         chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Regular);
         chatBox.AppendText(message + Environment.NewLine);
 
-        // Display separation
-        chatBox.SelectionColor = chatBox.ForeColor;
-        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
-        chatBox.AppendText(Environment.NewLine);
-
         chatBox.ScrollToCaret();
     }
 
@@ -91,7 +92,7 @@ public class ClientForm : Form
 
         if (sendBox.Text == string.Empty) return;
 
-        client.SendToServer(message, myUsername, myColor);
+        client.SendToServer(MessageType.ChatMessage, message, myUsername, myColor);
 
         DisplayMessage(sendBox.Text, myUsername, myColor);
 
