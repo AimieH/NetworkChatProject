@@ -9,6 +9,10 @@ Console.WriteLine("Starting server");
 using var server = new UdpClient(666);
 
 var clients = new List<IPEndPoint>();
+var messages = new List<Message>();
+IPEndPoint? lastSender = null;
+string? lastColor = null;
+string? lastUsername = null;
 
 while (true)
 {
@@ -17,8 +21,8 @@ while (true)
         var receiveResult = await server.ReceiveAsync();
         var msgBuffer = receiveResult.Buffer;
         var sender = receiveResult.RemoteEndPoint;
-        var receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
-            
+        var receivedJson = Encoding.UTF8.GetString(msgBuffer);
+        
         Message? receivedMessage = null;
         try
         {
@@ -34,23 +38,51 @@ while (true)
         switch (receivedMessage.Type)
         {
             case MessageType.ChatMessage:
-                Console.WriteLine($"{Encoding.UTF8.GetString(msgBuffer)}");
+                Console.WriteLine($"Message by {sender} : {receivedJson}");
         
-                if (!clients.Contains(sender)) clients.Add(sender);
-                foreach (var client in clients.Where(client => !Equals(client, sender)))
+                foreach (var client in clients)
+                {
+                    var isLastSender = Equals(lastSender, sender) && Equals(lastColor, receivedMessage.Color) && Equals(lastUsername, receivedMessage.Username);
+                    var messageToSend = new Message(MessageType.ChatMessage, receivedMessage.Text, receivedMessage.Username, receivedMessage.Color, isLastSender);
+                    await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
+                }
+                messages.Add(receivedMessage);
+                lastSender = sender;
+                lastColor = receivedMessage.Color;
+                lastUsername = receivedMessage.Username;
+                
+                break;
+            case MessageType.ChangeColor:
+                Console.WriteLine($"The sender {sender} changed color");
+                
+                foreach (var client in clients)
+                {
+                    await server.SendAsync(msgBuffer, msgBuffer.Length, client);
+                }
+                break;
+            case MessageType.ChangeUsername:
+                Console.WriteLine($"The sender {sender} changed username");
+                
+                foreach (var client in clients)
                 {
                     await server.SendAsync(msgBuffer, msgBuffer.Length, client);
                 }
                 break;
             case MessageType.Connect:
-                await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
+                Console.WriteLine($"The sender {sender} is trying to connect");
+                
+                if (!clients.Contains(sender))
+                {
+                    clients.Add(sender);
+                    await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
+                }
                 break;
             case MessageType.Disconnect:
                 break;
             case MessageType.Heartbeat:
                 break;
             default:
-                Console.WriteLine("Message type not handled :(");
+                Console.WriteLine("ERROR : Message type not handled :(");
                 break;
         }
     }

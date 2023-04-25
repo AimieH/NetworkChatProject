@@ -14,6 +14,7 @@ public class Client
 
     private readonly ClientForm form;
     private bool receiving = true;
+    private bool connected;
 
     public Client(ClientForm form)
     {
@@ -27,22 +28,36 @@ public class Client
             targetEndpoint = new IPEndPoint(ipAddress, 666);
             form.DisplayNotification("Checking given server...", NotificationType.Hint);
             StartReceiving();
-            SendToServer(MessageType.Connect);
+            SendMessage(MessageType.Connect);
         }
         else
         {
-            form.DisplayNotification("Given server ip is not an available one :(", NotificationType.Error);
+            form.DisplayNotification("Given server ip isn't valid :(", NotificationType.Error);
             form.Connect(false);
         }
     }
 
-    public async void SendToServer(MessageType type, string message = "", string username = "", Color color = new())
+    private async void SendToServer(Message message)
     {
-        var chatMessage = new Message(type, message, username, ColorTranslator.ToHtml(color));
-
-        var json = JsonSerializer.Serialize(chatMessage);
-
+        if (targetEndpoint is null) return;
+        
+        var json = JsonSerializer.Serialize(message);
         await client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
+        
+    }
+    public void SendMessage(MessageType type, string message = "", string username = "", Color color = new())
+    {
+        SendToServer(new Message(type, message, username, ColorTranslator.ToHtml(color)));
+    }
+    
+    public void ChangeColor(string username, Color color, Color lastColor)
+    {
+        SendToServer(new Message(MessageType.ChangeColor, "", username, ColorTranslator.ToHtml(color), false, ColorTranslator.ToHtml(lastColor)));
+    }
+    
+    public void ChangeUsername(string username, string lastUsername, Color color)
+    {
+        SendToServer(new Message(MessageType.ChangeUsername, "", username, ColorTranslator.ToHtml(color), false, lastUsername));
     }
 
     private async void StartReceiving()
@@ -63,23 +78,36 @@ public class Client
             {
                 form.DisplayNotification(ex.ToString(), NotificationType.Hint);
             }
-
+            
             if (receivedMessage is null) return;
 
+            var color = ColorTranslator.FromHtml(receivedMessage.Color);
             switch (receivedMessage.Type)
             {
                 case MessageType.ChatMessage:
-                    // Display received message
-                    var color = ColorTranslator.FromHtml(receivedMessage.Color);
-                    form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color);
+                    if (connected)
+                        form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color, receivedMessage.IsLastSender);
+                    break;
+                case MessageType.ChangeColor:
+                    if (connected)
+                    {
+                        var lastColor = ColorTranslator.FromHtml(receivedMessage.StringSlot);
+                        form.DisplayChange(receivedMessage.Username, receivedMessage.Username, color, lastColor);
+                    }
+                    break;
+                case MessageType.ChangeUsername:
+                    if (connected)
+                        form.DisplayChange(receivedMessage.Username, receivedMessage.StringSlot, color, color);
                     break;
                 case MessageType.Connect:
                     form.DisplayNotification("Connected to server :)", NotificationType.Success);
                     form.Connect(true);
+                    connected = true;
                     break;
                 case MessageType.Disconnect:
-                    form.DisplayNotification("Server disconnected :(", NotificationType.Error);
+                    form.DisplayNotification("Server disconnected :(", NotificationType.Hint);
                     form.Connect(false);
+                    connected = false;
                     break;
                 case MessageType.Heartbeat:
                     break;

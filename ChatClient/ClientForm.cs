@@ -20,7 +20,9 @@ public class ClientForm : Form
     private Button sendButton;
 
     private string myUsername;
+    private string? myLastUsername;
     private Color myColor = Color.Black;
+    private Color? myLastColor;
 
     public ClientForm()
     {
@@ -45,7 +47,25 @@ public class ClientForm : Form
         myUsername = usernames[Random.Shared.Next(usernames.Length) - 1];
         usernameBox.Text = myUsername;
     }
-
+    
+    public void DisplayChange(string username, string lastUsername, Color color, Color lastColor)
+    {
+        // Separator
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f);
+        chatBox.AppendText(Environment.NewLine);
+        
+        // Notification
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Bold);
+        chatBox.SelectionColor = lastColor;
+        chatBox.AppendText(lastUsername);
+        chatBox.SelectionColor = Color.GhostWhite;
+        chatBox.AppendText(" changed his displayed named to ");
+        chatBox.SelectionColor = color;
+        chatBox.AppendText(username + Environment.NewLine);
+        
+        chatBox.ScrollToCaret();
+    }
+    
     public void DisplayNotification(string message, NotificationType type)
     {
         chatBox.SelectionColor = type switch
@@ -55,28 +75,31 @@ public class ClientForm : Form
             NotificationType.Success => Color.LawnGreen,
             _ => Color.Black
         };
-        chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 10f, FontStyle.Bold);
         chatBox.AppendText(message + Environment.NewLine);
 
         chatBox.ScrollToCaret();
     }
 
-    public void DisplayMessage(string message, string username, Color color)
+    public void DisplayMessage(string message, string username, Color color, bool isLastSender)
     {
-        // Display separation
-        chatBox.SelectionColor = chatBox.ForeColor;
-        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
-        chatBox.AppendText(Environment.NewLine);
+        if (!isLastSender)
+        {
+            // Display separation
+            chatBox.SelectionColor = chatBox.ForeColor;
+            chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
+            chatBox.AppendText(Environment.NewLine);
         
-        // Display username
-        chatBox.SelectionColor = color;
-        chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
-        chatBox.AppendText($"{username} ");
+            // Display username
+            chatBox.SelectionColor = color;
+            chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
+            chatBox.AppendText($"{username} ");
 
-        // Display time
-        chatBox.SelectionColor = Color.GhostWhite;
-        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
-        chatBox.AppendText(DateTime.Now.ToString("HH:mm tt" + Environment.NewLine));
+            // Display time
+            chatBox.SelectionColor = Color.GhostWhite;
+            chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
+            chatBox.AppendText(DateTime.Now.ToString("HH:mm tt" + Environment.NewLine));
+        }
 
         // Display message
         chatBox.SelectionColor = chatBox.ForeColor;
@@ -92,9 +115,7 @@ public class ClientForm : Form
 
         if (sendBox.Text == string.Empty) return;
 
-        client.SendToServer(MessageType.ChatMessage, message, myUsername, myColor);
-
-        DisplayMessage(sendBox.Text, myUsername, myColor);
+        client.SendMessage(MessageType.ChatMessage, message, myUsername, myColor);
 
         sendBox.Clear();
         sendBox.Focus();
@@ -122,14 +143,18 @@ public class ClientForm : Form
 
     private void UsernameBox_TextChanged(object? sender, EventArgs e)
     {
-        myUsername = usernameBox.Text;
+        var newUsername = usernameBox.Text;
+        client.ChangeUsername(newUsername, myUsername, myColor);
+        myUsername = newUsername;
     }
 
     private void ColorButton_Click(object? sender, EventArgs e)
     {
         colorDialog.ShowDialog();
-        colorButton.BackColor = colorDialog.Color;
-        myColor = colorDialog.Color;
+        var newColor = colorDialog.Color;
+        colorButton.BackColor = newColor;
+        client.ChangeColor(myUsername, newColor, myColor);
+        myColor = newColor;
     }
 
     private void ConnectButton_Click(object? sender, EventArgs e)
@@ -229,7 +254,7 @@ public class ClientForm : Form
         usernameLabel.Name = "usernameLabel";
         usernameLabel.Size = new Size(168, 18);
         usernameLabel.TabIndex = 6;
-        usernameLabel.Text = "Choose your username :";
+        usernameLabel.Text = Resources.choose_username;
         // 
         // ipLabel
         // 
@@ -240,7 +265,7 @@ public class ClientForm : Form
         ipLabel.Name = "ipLabel";
         ipLabel.Size = new Size(77, 18);
         ipLabel.TabIndex = 8;
-        ipLabel.Text = "Server IP :";
+        ipLabel.Text = Resources.server_ip;
         // 
         // ipTextBox
         // 
