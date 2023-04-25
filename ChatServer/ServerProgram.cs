@@ -39,14 +39,15 @@ while (true)
         {
             case MessageType.ChatMessage:
                 Console.WriteLine($"Message by {sender} : {receivedJson}");
+                
+                var isLastSender = Equals(lastSender, sender) && Equals(lastColor, receivedMessage.Color) && Equals(lastUsername, receivedMessage.Username);
+                var messageToSend = new Message(MessageType.ChatMessage, receivedMessage.Text, receivedMessage.Username, receivedMessage.Color, isLastSender);
         
                 foreach (var client in clients)
                 {
-                    var isLastSender = Equals(lastSender, sender) && Equals(lastColor, receivedMessage.Color) && Equals(lastUsername, receivedMessage.Username);
-                    var messageToSend = new Message(MessageType.ChatMessage, receivedMessage.Text, receivedMessage.Username, receivedMessage.Color, isLastSender);
                     await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
                 }
-                messages.Add(receivedMessage);
+                messages.Add(messageToSend);
                 lastSender = sender;
                 lastColor = receivedMessage.Color;
                 lastUsername = receivedMessage.Username;
@@ -59,6 +60,7 @@ while (true)
                 {
                     await server.SendAsync(msgBuffer, msgBuffer.Length, client);
                 }
+                messages.Add(receivedMessage);
                 break;
             case MessageType.ChangeUsername:
                 Console.WriteLine($"The sender {sender} changed username");
@@ -67,15 +69,19 @@ while (true)
                 {
                     await server.SendAsync(msgBuffer, msgBuffer.Length, client);
                 }
+                messages.Add(receivedMessage);
                 break;
             case MessageType.Connect:
                 Console.WriteLine($"The sender {sender} is trying to connect");
-                
                 if (!clients.Contains(sender))
                 {
                     clients.Add(sender);
-                    await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
                 }
+                
+                await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
+
+                var bytesToSend = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Message(messages)));
+                await server.SendAsync(bytesToSend, bytesToSend.Length, sender);
                 break;
             case MessageType.Disconnect:
                 break;

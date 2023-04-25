@@ -57,7 +57,7 @@ public class Client
     
     public void ChangeUsername(string username, string lastUsername, Color color)
     {
-        SendToServer(new Message(MessageType.ChangeUsername, "", username, ColorTranslator.ToHtml(color), false, lastUsername));
+        SendToServer(new Message(MessageType.ChangeUsername,"",  username, ColorTranslator.ToHtml(color), false, lastUsername));
     }
 
     private async void StartReceiving()
@@ -74,9 +74,10 @@ public class Client
             {
                 receivedMessage = JsonSerializer.Deserialize<Message>(receivedJson);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
-                form.DisplayNotification(ex.ToString(), NotificationType.Hint);
+                form.DisplayNotification("History has been lost", NotificationType.Error);
+                form.DisplayNotification(receivedJson, NotificationType.Error);
             }
             
             if (receivedMessage is null) return;
@@ -110,6 +111,30 @@ public class Client
                     connected = false;
                     break;
                 case MessageType.Heartbeat:
+                    break;
+                case MessageType.HistorySend:
+                    foreach (var message in receivedMessage.History)
+                    {
+                        var messageColor = ColorTranslator.FromHtml(message.Color);
+                        switch (message.Type)
+                        {
+                            case MessageType.ChangeColor:
+                                var lastColor = ColorTranslator.FromHtml(message.StringSlot);
+                                form.DisplayChange(message.Username, message.Username, messageColor, lastColor);
+                                break;
+                            case MessageType.ChangeUsername:
+                                form.DisplayChange(message.Username, message.StringSlot, messageColor, messageColor);
+                                break;
+                            case MessageType.ChatMessage:
+                            case MessageType.Connect:
+                            case MessageType.Disconnect:
+                            case MessageType.Heartbeat:
+                            case MessageType.HistorySend:
+                            default:
+                                form.DisplayMessage(message.Text, message.Username, messageColor, message.IsLastSender);
+                                break;
+                        }
+                    }
                     break;
                 default:
                     form.DisplayNotification("Message type not handled :(", NotificationType.Error);

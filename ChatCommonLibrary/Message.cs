@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ChatCommonLibrary
 {
@@ -10,7 +11,8 @@ namespace ChatCommonLibrary
         ChangeUsername,
         Connect,
         Disconnect,
-        Heartbeat
+        Heartbeat,
+        HistorySend
     }
 
     [Serializable]
@@ -22,10 +24,22 @@ namespace ChatCommonLibrary
         public string Color { get; set; }
         public bool IsLastSender { get; set; }
         public string StringSlot { get; set; }
+        public List<Message> History { get; set; }
 
         public Message()
         {
             // Required for deserialization
+        }
+        
+        public Message(List<Message> history)
+        {
+            Type = MessageType.HistorySend;
+            Text = "";
+            Username = "";
+            Color = "";
+            IsLastSender = false;
+            StringSlot = "";
+            History = history;
         }
         
         public Message(MessageType type, string message, string username, string color, bool isLastSender = false, string stringSlot = "")
@@ -36,6 +50,7 @@ namespace ChatCommonLibrary
             Color = color;
             IsLastSender = isLastSender;
             StringSlot = stringSlot;
+            History = new List<Message>();
         }
     }
 }
