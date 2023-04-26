@@ -76,20 +76,24 @@ while (true)
                 Console.WriteLine($"The sender {sender} is trying to connect");
                 if (!clients.Contains(sender))
                 {
+                    // Adding client
                     clients.Add(sender);
                 }
                 
+                // Tell client
                 await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
-                
+
+                // History
+                var bytesToSend = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Message(messages)));
+                await server.SendAsync(bytesToSend, bytesToSend.Length, sender);
+                    
+                // Sent to all client
                 messageToSend = new Message(MessageType.Connect, receivedMessage.Username, receivedMessage.Color, "", true);
                 foreach (var client in clients)
                 {
                     await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
                 }
                 messages.Add(messageToSend);
-
-                var bytesToSend = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Message(messages)));
-                await server.SendAsync(bytesToSend, bytesToSend.Length, sender);
                 break;
             case MessageType.Disconnect:
                 messageToSend = new Message(MessageType.Disconnect, receivedMessage.Username, receivedMessage.Color, "", true);
