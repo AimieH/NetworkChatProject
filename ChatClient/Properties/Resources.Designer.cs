@@ -87,6 +87,15 @@ namespace ChatClient.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 10.51.1.32.
+        /// </summary>
+        internal static string default_ip {
+            get {
+                return ResourceManager.GetString("default_ip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap sendIcon {

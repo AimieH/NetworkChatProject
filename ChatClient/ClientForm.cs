@@ -19,10 +19,8 @@ public class ClientForm : Form
     private Button connectButton;
     private Button sendButton;
 
-    private string myUsername;
-    private string? myLastUsername;
-    private Color myColor = Color.Black;
-    private Color? myLastColor;
+    public string Username { get; private set; }
+    public Color Color { get; private set; } = Color.Black;
 
     public ClientForm()
     {
@@ -38,14 +36,31 @@ public class ClientForm : Form
         int r = Random.Shared.Next(200) + 55;
         int g = Random.Shared.Next(200) + 55;
         int b = Random.Shared.Next(200) + 55;
-        myColor = Color.FromArgb(255, r, g, b);
-        colorButton.BackColor = myColor;
+        Color = Color.FromArgb(255, r, g, b);
+        colorButton.BackColor = Color;
     }
 
     private void SetRandomUsername()
     {
-        myUsername = usernames[Random.Shared.Next(usernames.Length) - 1];
-        usernameBox.Text = myUsername;
+        Username = usernames[Random.Shared.Next(usernames.Length) - 1];
+        usernameBox.Text = Username;
+    }
+    
+    public void DisplayPlayersUpdate(string username, Color color, bool joined)
+    {
+        // Separator
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f);
+        chatBox.AppendText(Environment.NewLine);
+        
+        // Notification
+        chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Bold);
+        chatBox.SelectionColor = color;
+        chatBox.AppendText(username);
+        chatBox.SelectionColor = Color.GhostWhite;
+        chatBox.AppendText(joined ? " has joined the chat" : " has left the chat");
+        chatBox.AppendText(Environment.NewLine);
+        
+        chatBox.ScrollToCaret();
     }
     
     public void DisplayChange(string username, string lastUsername, Color color, Color lastColor)
@@ -81,7 +96,7 @@ public class ClientForm : Form
         chatBox.ScrollToCaret();
     }
 
-    public void DisplayMessage(string message, string username, Color color, bool isLastSender)
+    public void DisplayMessage(string message, string username, Color color, string date, bool isLastSender)
     {
         if (!isLastSender)
         {
@@ -98,7 +113,7 @@ public class ClientForm : Form
             // Display time
             chatBox.SelectionColor = Color.GhostWhite;
             chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Regular);
-            chatBox.AppendText(DateTime.Now.ToString("HH:mm tt" + Environment.NewLine));
+            chatBox.AppendText(date + Environment.NewLine);
         }
 
         // Display message
@@ -115,7 +130,7 @@ public class ClientForm : Form
 
         if (sendBox.Text == string.Empty) return;
 
-        client.SendMessage(MessageType.ChatMessage, message, myUsername, myColor);
+        client.SendMessage(MessageType.ChatMessage, message, Username, Color);
 
         sendBox.Clear();
         sendBox.Focus();
@@ -144,8 +159,8 @@ public class ClientForm : Form
     private void UsernameBox_TextChanged(object? sender, EventArgs e)
     {
         var newUsername = usernameBox.Text;
-        client.ChangeUsername(newUsername, myUsername, myColor);
-        myUsername = newUsername;
+        client.ChangeUsername(newUsername, Username, Color);
+        Username = newUsername;
     }
 
     private void ColorButton_Click(object? sender, EventArgs e)
@@ -153,8 +168,8 @@ public class ClientForm : Form
         colorDialog.ShowDialog();
         var newColor = colorDialog.Color;
         colorButton.BackColor = newColor;
-        client.ChangeColor(myUsername, newColor, myColor);
-        myColor = newColor;
+        client.ChangeColor(Username, newColor, Color);
+        Color = newColor;
     }
 
     private void ConnectButton_Click(object? sender, EventArgs e)
@@ -277,7 +292,7 @@ public class ClientForm : Form
         ipTextBox.Name = "ipTextBox";
         ipTextBox.Size = new Size(241, 26);
         ipTextBox.TabIndex = 7;
-        ipTextBox.Text = "10.51.2.72";
+        ipTextBox.Text = Resources.default_ip;
         // 
         // connectButton
         // 

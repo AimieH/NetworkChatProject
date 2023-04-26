@@ -35,13 +35,14 @@ while (true)
 
         if (receivedMessage is null) return;
 
+        Message messageToSend;
         switch (receivedMessage.Type)
         {
             case MessageType.ChatMessage:
                 Console.WriteLine($"Message by {sender} : {receivedJson}");
                 
                 var isLastSender = Equals(lastSender, sender) && Equals(lastColor, receivedMessage.Color) && Equals(lastUsername, receivedMessage.Username);
-                var messageToSend = new Message(MessageType.ChatMessage, receivedMessage.Text, receivedMessage.Username, receivedMessage.Color, isLastSender);
+                messageToSend = new Message(MessageType.ChatMessage, receivedMessage.Text, receivedMessage.Username, receivedMessage.Color, receivedMessage.Date, isLastSender);
         
                 foreach (var client in clients)
                 {
@@ -79,6 +80,12 @@ while (true)
                 }
                 
                 await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
+
+                messageToSend = new Message(MessageType.PlayersUpdate, receivedMessage.Username, receivedMessage.Color, "", true);
+                foreach (var client in clients)
+                {
+                    await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
+                }
 
                 var bytesToSend = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Message(messages)));
                 await server.SendAsync(bytesToSend, bytesToSend.Length, sender);

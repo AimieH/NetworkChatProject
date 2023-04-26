@@ -136,4 +136,7 @@
   <data name="connect" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="default_ip" xml:space="preserve">
+    <value>10.51.1.32</value>
+  </data>
 </root>

@@ -13,7 +13,7 @@ public class Client
     private IPEndPoint? targetEndpoint;
 
     private readonly ClientForm form;
-    private bool receiving = true;
+    private bool receiving;
     private bool connected;
 
     public Client(ClientForm form)
@@ -28,7 +28,7 @@ public class Client
             targetEndpoint = new IPEndPoint(ipAddress, 666);
             form.DisplayNotification("Checking given server...", NotificationType.Hint);
             StartReceiving();
-            SendMessage(MessageType.Connect);
+            SendMessage(MessageType.Connect, "", form.Username, form.Color);
         }
         else
         {
@@ -42,31 +42,57 @@ public class Client
         if (targetEndpoint is null) return;
         
         var json = JsonSerializer.Serialize(message);
-        await client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
-        
+        try
+        {
+            await client.SendAsync(Encoding.UTF8.GetBytes(json), targetEndpoint);
+        }
+        catch (Exception e)
+        {
+            form.DisplayNotification(e.ToString(), NotificationType.Error);
+        }
     }
+        
     public void SendMessage(MessageType type, string message = "", string username = "", Color color = new())
     {
-        SendToServer(new Message(type, message, username, ColorTranslator.ToHtml(color)));
+        SendToServer(new Message(type, message, username, ColorTranslator.ToHtml(color), GetDateToString()));
     }
     
     public void ChangeColor(string username, Color color, Color lastColor)
     {
-        SendToServer(new Message(MessageType.ChangeColor, "", username, ColorTranslator.ToHtml(color), false, ColorTranslator.ToHtml(lastColor)));
+        SendToServer(new Message(MessageType.ChangeColor, username, ColorTranslator.ToHtml(color), ColorTranslator.ToHtml(lastColor)));
     }
     
     public void ChangeUsername(string username, string lastUsername, Color color)
     {
-        SendToServer(new Message(MessageType.ChangeUsername,"",  username, ColorTranslator.ToHtml(color), false, lastUsername));
+        SendToServer(new Message(MessageType.ChangeUsername,  username, ColorTranslator.ToHtml(color), lastUsername));
     }
 
+    private string GetDateToString()
+    { 
+        return DateTime.Now.ToString("HH:mm tt");
+    }
     private async void StartReceiving()
     {
         form.DisplayNotification("Receiving started...", NotificationType.Hint);
+        receiving = true;
         
         while (receiving)
         {
-            var receiveResult = await client.ReceiveAsync();
+            UdpReceiveResult? tryReceiveResult = null;
+            try
+            {
+                tryReceiveResult = await client.ReceiveAsync();
+            }
+            catch (SocketException)
+            {
+                form.DisplayNotification("Connection failed", NotificationType.Error);
+                connected = false;
+                receiving = false;
+            }
+            
+            if (tryReceiveResult is null) return;
+            var receiveResult = (UdpReceiveResult) tryReceiveResult;
+            
             var receivedJson = Encoding.UTF8.GetString(receiveResult.Buffer);
             
             Message? receivedMessage = null;
@@ -87,7 +113,11 @@ public class Client
             {
                 case MessageType.ChatMessage:
                     if (connected)
-                        form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color, receivedMessage.IsLastSender);
+                        form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color, receivedMessage.Date, receivedMessage.BoolSlot);
+                    break;
+                case MessageType.PlayersUpdate:
+                    if (connected)
+                        form.DisplayPlayersUpdate(receivedMessage.Username, color, receivedMessage.BoolSlot);
                     break;
                 case MessageType.ChangeColor:
                     if (connected)
@@ -126,12 +156,13 @@ public class Client
                                 form.DisplayChange(message.Username, message.StringSlot, messageColor, messageColor);
                                 break;
                             case MessageType.ChatMessage:
+                            case MessageType.PlayersUpdate:
                             case MessageType.Connect:
                             case MessageType.Disconnect:
                             case MessageType.Heartbeat:
                             case MessageType.HistorySend:
                             default:
-                                form.DisplayMessage(message.Text, message.Username, messageColor, message.IsLastSender);
+                                form.DisplayMessage(message.Text, message.Username, messageColor, message.Date, message.BoolSlot);
                                 break;
                         }
                     }

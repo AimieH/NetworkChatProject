@@ -7,6 +7,7 @@ namespace ChatCommonLibrary
     public enum MessageType
     {
         ChatMessage,
+        PlayersUpdate,
         ChangeColor,
         ChangeUsername,
         Connect,
@@ -22,7 +23,8 @@ namespace ChatCommonLibrary
         public string Text { get; set; }
         public string Username { get; set; }
         public string Color { get; set; }
-        public bool IsLastSender { get; set; }
+        public string Date { get; set; }
+        public bool BoolSlot { get; set; }
         public string StringSlot { get; set; }
         public List<Message> History { get; set; }
 
@@ -37,19 +39,33 @@ namespace ChatCommonLibrary
             Text = "";
             Username = "";
             Color = "";
-            IsLastSender = false;
+            Date = "";
+            BoolSlot = false;
             StringSlot = "";
             History = history;
         }
         
-        public Message(MessageType type, string message, string username, string color, bool isLastSender = false, string stringSlot = "")
+        public Message(MessageType type, string username, string color, string stringSlot = "", bool boolSlot = false)
+        {
+            Type = type;
+            Text = "";
+            Username = username;
+            Color = color;
+            Date = "";
+            BoolSlot = boolSlot;
+            StringSlot = stringSlot;
+            History = new List<Message>();
+        }
+        
+        public Message(MessageType type, string message, string username, string color, string date, bool boolSlot = false)
         {
             Type = type;
             Text = message;
             Username = username;
             Color = color;
-            IsLastSender = isLastSender;
-            StringSlot = stringSlot;
+            Date = date;
+            BoolSlot = boolSlot;
+            StringSlot = "";
             History = new List<Message>();
         }
     }
