@@ -139,4 +139,7 @@
   <data name="default_ip" xml:space="preserve">
     <value>10.51.1.32</value>
   </data>
+  <data name="disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
 </root>

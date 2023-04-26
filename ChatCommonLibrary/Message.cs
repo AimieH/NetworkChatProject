@@ -7,7 +7,6 @@ namespace ChatCommonLibrary
     public enum MessageType
     {
         ChatMessage,
-        PlayersUpdate,
         ChangeColor,
         ChangeUsername,
         Connect,

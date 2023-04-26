@@ -5,30 +5,46 @@ namespace ChatClient;
 
 public class ClientForm : Form
 {
-    private static readonly string[] usernames = { "ChatonFéroce", "ChoupiPanda", "RatonLaveur", "TitiGivré", "BouleDePoule", "TigrouFou", "LapinDentelle", "KoalaFunky", "RenardAstucieux", "LoupBlagueur", "ZèbreFarceur", "GirafeTordue", "ChimpanzéCinglé", "HippopotameHilarant", "ÉcureuilÉtourdi", "PhoqueFoufou", "GrenouilleGivrée", "AlligatorAmusant", "OursRieur", "PingouinPince-Sans-Rire", "CrocodileComique", "PerroquetPlaisantin", "SingeSarcastique", "LamaLunatique", "VacheVentriloque", "ÉléphantEsprit", "LoutreLoufoque", "MarmotteMarrante", "HérissonHilarant", "CastorCocasse", "NarvalNarcissique", "OrnithorynqueOriental", "RhinocérosRieur", "SaumonSarcastique", "AigleAmusé", "BaleineBlagueuse", "CanardClownesque", "DindonDramatique", "EscargotÉtonné", "FourmiFarfelue", "GirouetteGrotesque", "HéronHilarant", "IbisIrrévérencieux", "JaguarJovial", "KangourouKamikaze", "LézardLoufoque", "MéduseMarrante", "NandouNarquois", "OrqueObservateur" };
+    private static readonly string?[] usernames = { "ChatonFéroce", "ChoupiPanda", "RatonLaveur", "TitiGivré", "BouleDePoule", "TigrouFou", "LapinDentelle", "KoalaFunky", "RenardAstucieux", "LoupBlagueur", "ZèbreFarceur", "GirafeTordue", "ChimpanzéCinglé", "HippopotameHilarant", "ÉcureuilÉtourdi", "PhoqueFoufou", "GrenouilleGivrée", "AlligatorAmusant", "OursRieur", "PingouinPince-Sans-Rire", "CrocodileComique", "PerroquetPlaisantin", "SingeSarcastique", "LamaLunatique", "VacheVentriloque", "ÉléphantEsprit", "LoutreLoufoque", "MarmotteMarrante", "HérissonHilarant", "CastorCocasse", "NarvalNarcissique", "OrnithorynqueOriental", "RhinocérosRieur", "SaumonSarcastique", "AigleAmusé", "BaleineBlagueuse", "CanardClownesque", "DindonDramatique", "EscargotÉtonné", "FourmiFarfelue", "GirouetteGrotesque", "HéronHilarant", "IbisIrrévérencieux", "JaguarJovial", "KangourouKamikaze", "LézardLoufoque", "MéduseMarrante", "NandouNarquois", "OrqueObservateur" };
     private Client client;
+    
     private RichTextBox chatBox;
     private ColorDialog colorDialog;
     private Button colorButton;
     private TextBox sendBox;
-
     private TextBox usernameBox;
     private Label usernameLabel;
     private Label ipLabel;
     private TextBox ipTextBox;
     private Button connectButton;
+    private Button disconnectButton;
     private Button sendButton;
 
-    public string Username { get; private set; }
+    public string Username { get; private set; } = "";
     public Color Color { get; private set; } = Color.Black;
 
     public ClientForm()
     {
+        {
+            sendBox = new TextBox();
+            chatBox = new RichTextBox();
+            colorDialog = new ColorDialog();
+            colorButton = new Button();
+            usernameBox = new TextBox();
+            usernameLabel = new Label();
+            ipLabel = new Label();
+            ipTextBox = new TextBox();
+            connectButton = new Button();
+            disconnectButton = new Button();
+            sendButton = new Button();
+        }
+
         client = new Client(this);
         InitializeComponent();
         SetRandomColor();
         SetRandomUsername();
         sendBox.Enabled = false;
+        disconnectButton.Enabled = false;
     }
 
     private void SetRandomColor()
@@ -42,33 +58,32 @@ public class ClientForm : Form
 
     private void SetRandomUsername()
     {
-        Username = usernames[Random.Shared.Next(usernames.Length) - 1];
+        Username = usernames[Random.Shared.Next(usernames.Length) - 1] ?? "";
         usernameBox.Text = Username;
     }
-    
+
     public void DisplayPlayersUpdate(string username, Color color, bool joined)
     {
         // Separator
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f);
         chatBox.AppendText(Environment.NewLine);
-        
+
         // Notification
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Bold);
         chatBox.SelectionColor = color;
         chatBox.AppendText(username);
         chatBox.SelectionColor = Color.GhostWhite;
-        chatBox.AppendText(joined ? " has joined the chat" : " has left the chat");
-        chatBox.AppendText(Environment.NewLine);
-        
+        chatBox.AppendText(joined ? " has joined the chat" : " has left the chat" + Environment.NewLine);
+
         chatBox.ScrollToCaret();
     }
-    
+
     public void DisplayChange(string username, string lastUsername, Color color, Color lastColor)
     {
         // Separator
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f);
         chatBox.AppendText(Environment.NewLine);
-        
+
         // Notification
         chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 8f, FontStyle.Bold);
         chatBox.SelectionColor = lastColor;
@@ -77,10 +92,10 @@ public class ClientForm : Form
         chatBox.AppendText(" changed his displayed named to ");
         chatBox.SelectionColor = color;
         chatBox.AppendText(username + Environment.NewLine);
-        
+
         chatBox.ScrollToCaret();
     }
-    
+
     public void DisplayNotification(string message, NotificationType type)
     {
         chatBox.SelectionColor = type switch
@@ -104,7 +119,7 @@ public class ClientForm : Form
             chatBox.SelectionColor = chatBox.ForeColor;
             chatBox.SelectionFont = new Font(chatBox.Font.FontFamily, 5f, FontStyle.Regular);
             chatBox.AppendText(Environment.NewLine);
-        
+
             // Display username
             chatBox.SelectionColor = color;
             chatBox.SelectionFont = new Font(chatBox.Font, FontStyle.Bold);
@@ -162,6 +177,11 @@ public class ClientForm : Form
         client.ChangeUsername(newUsername, Username, Color);
         Username = newUsername;
     }
+    
+    private void IpBox_TextChanged(object? sender, EventArgs e)
+    {
+        connectButton.Enabled = client.IsSameIp(ipTextBox.Text);
+    }
 
     private void ColorButton_Click(object? sender, EventArgs e)
     {
@@ -176,10 +196,17 @@ public class ClientForm : Form
     {
         client.ConnectToServer(ipTextBox.Text);
     }
+    
+    private void DisconnectButton_Click(object? sender, EventArgs e)
+    {
+        client.Disconnect(true);
+    }
 
     public void Connect(bool success)
     {
         sendBox.Enabled = success;
+        disconnectButton.Enabled = success;
+        connectButton.Enabled = !success;
         if (success)
         {
             sendBox.Focus();
@@ -198,6 +225,7 @@ public class ClientForm : Form
         ipTextBox = new TextBox();
         connectButton = new Button();
         sendButton = new Button();
+        disconnectButton = new Button();
         SuspendLayout();
         // 
         // sendBox
@@ -293,6 +321,7 @@ public class ClientForm : Form
         ipTextBox.Size = new Size(241, 26);
         ipTextBox.TabIndex = 7;
         ipTextBox.Text = Resources.default_ip;
+        ipTextBox.TextChanged += IpBox_TextChanged;
         // 
         // connectButton
         // 
@@ -326,10 +355,25 @@ public class ClientForm : Form
         sendButton.UseVisualStyleBackColor = false;
         sendButton.Click += SendButton_Click;
         // 
+        // disconnectButton
+        // 
+        disconnectButton.BackColor = SystemColors.WindowFrame;
+        disconnectButton.FlatStyle = FlatStyle.Popup;
+        disconnectButton.Font = new Font("Bahnschrift", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
+        disconnectButton.ForeColor = SystemColors.Control;
+        disconnectButton.Location = new Point(606, 13);
+        disconnectButton.Name = "disconnectButton";
+        disconnectButton.Size = new Size(158, 26);
+        disconnectButton.TabIndex = 11;
+        disconnectButton.Text = Resources.disconnect;
+        disconnectButton.UseVisualStyleBackColor = false;
+        disconnectButton.Click += DisconnectButton_Click;
+        // 
         // ClientForm
         // 
         BackColor = Color.FromArgb(61, 61, 61);
         ClientSize = new Size(822, 703);
+        Controls.Add(disconnectButton);
         Controls.Add(sendButton);
         Controls.Add(connectButton);
         Controls.Add(ipLabel);

@@ -80,20 +80,28 @@ while (true)
                 }
                 
                 await server.SendAsync(msgBuffer, msgBuffer.Length, sender);
-
-                messageToSend = new Message(MessageType.PlayersUpdate, receivedMessage.Username, receivedMessage.Color, "", true);
+                
+                messageToSend = new Message(MessageType.Connect, receivedMessage.Username, receivedMessage.Color, "", true);
                 foreach (var client in clients)
                 {
                     await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
                 }
+                messages.Add(messageToSend);
 
                 var bytesToSend = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Message(messages)));
                 await server.SendAsync(bytesToSend, bytesToSend.Length, sender);
                 break;
             case MessageType.Disconnect:
+                messageToSend = new Message(MessageType.Disconnect, receivedMessage.Username, receivedMessage.Color, "", true);
+                foreach (var client in clients)
+                {
+                    await server.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageToSend)), client);
+                }
+                messages.Add(messageToSend);
                 break;
             case MessageType.Heartbeat:
                 break;
+            case MessageType.HistorySend:
             default:
                 Console.WriteLine("ERROR : Message type not handled :(");
                 break;

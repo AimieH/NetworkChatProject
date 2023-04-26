@@ -34,9 +34,24 @@ public class Client
         {
             form.DisplayNotification("Given server ip isn't valid :(", NotificationType.Error);
             form.Connect(false);
+            connected = false;
         }
     }
 
+    public void Disconnect(bool sendToServer)
+    {
+        if (sendToServer) SendMessage(MessageType.Disconnect, "", form.Username, form.Color);
+        form.Connect(false);
+        targetEndpoint = null;
+        connected = false;
+        receiving = false;
+    }
+
+    public bool IsSameIp(string ip)
+    {
+        return targetEndpoint is not null && Equals(targetEndpoint.Address.ToString(), ip);
+    }
+    
     private async void SendToServer(Message message)
     {
         if (targetEndpoint is null) return;
@@ -52,17 +67,17 @@ public class Client
         }
     }
         
-    public void SendMessage(MessageType type, string message = "", string username = "", Color color = new())
+    public void SendMessage(MessageType type, string message = "", string? username = "", Color color = new())
     {
         SendToServer(new Message(type, message, username, ColorTranslator.ToHtml(color), GetDateToString()));
     }
     
-    public void ChangeColor(string username, Color color, Color lastColor)
+    public void ChangeColor(string? username, Color color, Color lastColor)
     {
         SendToServer(new Message(MessageType.ChangeColor, username, ColorTranslator.ToHtml(color), ColorTranslator.ToHtml(lastColor)));
     }
     
-    public void ChangeUsername(string username, string lastUsername, Color color)
+    public void ChangeUsername(string username, string? lastUsername, Color color)
     {
         SendToServer(new Message(MessageType.ChangeUsername,  username, ColorTranslator.ToHtml(color), lastUsername));
     }
@@ -86,8 +101,8 @@ public class Client
             catch (SocketException)
             {
                 form.DisplayNotification("Connection failed", NotificationType.Error);
-                connected = false;
-                receiving = false;
+                form.Connect(false);
+                Disconnect(false);
             }
             
             if (tryReceiveResult is null) return;
@@ -115,10 +130,6 @@ public class Client
                     if (connected)
                         form.DisplayMessage(receivedMessage.Text, receivedMessage.Username, color, receivedMessage.Date, receivedMessage.BoolSlot);
                     break;
-                case MessageType.PlayersUpdate:
-                    if (connected)
-                        form.DisplayPlayersUpdate(receivedMessage.Username, color, receivedMessage.BoolSlot);
-                    break;
                 case MessageType.ChangeColor:
                     if (connected)
                     {
@@ -131,14 +142,28 @@ public class Client
                         form.DisplayChange(receivedMessage.Username, receivedMessage.StringSlot, color, color);
                     break;
                 case MessageType.Connect:
-                    form.DisplayNotification("Connected to server :)", NotificationType.Success);
-                    form.Connect(true);
-                    connected = true;
+                    if (receivedMessage.BoolSlot)
+                    {
+                        form.DisplayPlayersUpdate(receivedMessage.Username, color, true);
+                    }
+                    else
+                    {
+                        form.DisplayNotification("Connected to server :)", NotificationType.Success);
+                        form.Connect(true);
+                        connected = true;
+                    }
                     break;
                 case MessageType.Disconnect:
-                    form.DisplayNotification("Server disconnected :(", NotificationType.Hint);
-                    form.Connect(false);
-                    connected = false;
+                    if (receivedMessage.BoolSlot)
+                    {
+                        form.DisplayPlayersUpdate(receivedMessage.Username, color, false);
+                    }
+                    else
+                    {
+                        form.DisplayNotification("Server disconnected :(", NotificationType.Hint);
+                        form.Connect(false);
+                        Disconnect(false);
+                    }
                     break;
                 case MessageType.Heartbeat:
                     break;
@@ -155,10 +180,13 @@ public class Client
                             case MessageType.ChangeUsername:
                                 form.DisplayChange(message.Username, message.StringSlot, messageColor, messageColor);
                                 break;
-                            case MessageType.ChatMessage:
-                            case MessageType.PlayersUpdate:
                             case MessageType.Connect:
+                                form.DisplayPlayersUpdate(message.Username, messageColor, true);
+                                break;
                             case MessageType.Disconnect:
+                                form.DisplayPlayersUpdate(message.Username, messageColor, false);
+                                break;
+                            case MessageType.ChatMessage:
                             case MessageType.Heartbeat:
                             case MessageType.HistorySend:
                             default:
