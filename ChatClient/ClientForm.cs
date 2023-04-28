@@ -73,7 +73,7 @@ public class ClientForm : Form
         chatBox.SelectionColor = color;
         chatBox.AppendText(username);
         chatBox.SelectionColor = Color.GhostWhite;
-        chatBox.AppendText(joined ? " has joined the chat" : " has left the chat" + Environment.NewLine);
+        chatBox.AppendText((joined ? " has joined the chat" : " has left the chat") + Environment.NewLine);
 
         chatBox.ScrollToCaret();
     }

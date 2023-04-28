@@ -42,6 +42,7 @@ public class Client
     {
         if (sendToServer) SendMessage(MessageType.Disconnect, "", form.Username, form.Color);
         form.Connect(false);
+        form.DisplayNotification("Disconnected :)", NotificationType.Success);
         targetEndpoint = null;
         connected = false;
         receiving = false;
