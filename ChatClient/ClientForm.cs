@@ -180,7 +180,7 @@ public class ClientForm : Form
     
     private void IpBox_TextChanged(object? sender, EventArgs e)
     {
-        connectButton.Enabled = client.IsSameIp(ipTextBox.Text);
+        connectButton.Enabled = !client.IsSameIp(ipTextBox.Text);
     }
 
     private void ColorButton_Click(object? sender, EventArgs e)

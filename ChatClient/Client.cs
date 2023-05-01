@@ -50,7 +50,7 @@ public class Client
 
     public bool IsSameIp(string ip)
     {
-        return targetEndpoint is not null && Equals(targetEndpoint.Address.ToString(), ip);
+        return targetEndpoint != null && Equals(targetEndpoint.Address.ToString(), ip);
     }
     
     private async void SendToServer(Message message)
